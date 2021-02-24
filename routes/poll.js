@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 const Pusher = require("pusher");
+
+const Score = require('../models/Score');
 
 const pusher = new Pusher({
     appId: "1160172",
@@ -15,14 +18,21 @@ router.get('/', (req, res) => {
 });    
 
 router.post('/', (req, res) => {
-    pusher.trigger("as-grid", "as-score", {
-        points: 1,
-        as: req.body.as
+    const newScore = {
+        as: req.body.as,
+        points: 1
+    }
+
+    new Score(newScore).save().then(score => {
+        pusher.trigger("as-grid", "as-score", {
+            points: parseInt(score.points),
+            as: score.as
+        });
+        return res.json({
+            success: true, 
+            message: "Thank you for voting."
+        })
     });
-    return res.json({
-        success: true, 
-        message: "Thank you for voting."
-    })
 }); 
 
 module.exports = router;
