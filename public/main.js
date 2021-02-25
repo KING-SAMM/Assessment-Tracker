@@ -20,53 +20,66 @@ form.addEventListener('submit', (e) => {
     e.preventDefault();
 })
 
+fetch('http://localhost:5000/poll')
+    .then(res => res.json())
+    .then(data => {
+        const scores = data.scores;
+        const totalScores = scores.length;
 
-let dataPoints = [
-    {label: 'Adegbite', y: 0},
-    {label: 'Fuad', y: 0},
-    {label: 'Idris', y: 0},
-    {label: 'Michael', y: 0},
-    {label: 'Mohammed', y: 0},
-    {label: 'Oladeji', y: 0}
-];
+        // Count Score Points
+        const scoreCounts = scores.reduce((acc, score) => (acc[score.as] = ((acc[score.as] || 0) + parseInt(score.points)), acc), {});
 
-const chartContainer = document.querySelector('#chartContainer');
 
-if(chartContainer) {
-    const chart = new CanvasJS.Chart('chartContainer', {
-        animationEnabled: true,
-        theme: 'theme1',
-        title: {
-            text: 'Assessment results'
-        },
-        data: [
-            {
-                type: 'column',
-                dataPoints: dataPoints
-            }
-        ]
+        let dataPoints = [
+            {label: 'Adegbite', y: scoreCounts.Adegbite},
+            {label: 'Fuad', y: scoreCounts.Fuad},
+            {label: 'Idris', y: scoreCounts.Idris},
+            {label: 'Michael', y: scoreCounts.Michael},
+            {label: 'Mohammed', y: scoreCounts.Mohammed},
+            {label: 'Oladeji', y: scoreCounts.Oladeji}
+        ];
+        
+        const chartContainer = document.querySelector('#chartContainer');
+        
+        if(chartContainer) {
+            const chart = new CanvasJS.Chart('chartContainer', {
+                animationEnabled: true,
+                theme: 'theme1',
+                title: {
+                    text: 'Assessment results'
+                },
+                data: [
+                    {
+                        type: 'column',
+                        dataPoints: dataPoints
+                    }
+                ]
+            });
+        
+            chart.render();
+        
+            // Enable pusher logging - don't include this in production
+            Pusher.logToConsole = true;
+        
+            var pusher = new Pusher('a29727e57463a5749bcf', {
+              cluster: 'eu'
+            });
+        
+            var channel = pusher.subscribe('as-grid');
+            channel.bind('as-score', function(data) {
+              dataPoints = dataPoints.map(x => {
+                  if(x.label == data.as) {
+                      x.y += data.points;
+                      return x;
+                  } else {
+                      return x;
+                  }
+              });
+              chart.render();
+            });
+        }
+        
     });
 
-    chart.render();
 
-    // Enable pusher logging - don't include this in production
-    Pusher.logToConsole = true;
-
-    var pusher = new Pusher('a29727e57463a5749bcf', {
-      cluster: 'eu'
-    });
-
-    var channel = pusher.subscribe('as-grid');
-    channel.bind('as-score', function(data) {
-      dataPoints = dataPoints.map(x => {
-          if(x.label == data.as) {
-              x.y += data.points;
-              return x;
-          } else {
-              return x;
-          }
-      });
-      chart.render();
-    });
-}
 
