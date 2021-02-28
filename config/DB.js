@@ -5,7 +5,8 @@ mongoose.Promise = global.Promise;
 
 // Mongoose Connect
 mongoose.connect(
-    // Connection string here, 
+    /* 'mongodb+srv://Owner:%26%23oMnEr4581@cluster0.9lwab.mongodb.net/myFirstDatabase?retryWrites=true&w=majority', */
+    'mongodb+srv://KCSamm:kcEpIsTeMoLoGy4581@score.snwx3.mongodb.net/assessmentScore?retryWrites=true&w=majority', 
     { 
         useNewUrlParser: true, 
         useUnifiedTopology: true,

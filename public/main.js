@@ -5,7 +5,7 @@ form.addEventListener('submit', (e) => {
 
     const data = {as: choice};
 
-    fetch('http://localhost:5000/poll', {
+    fetch('https://assessment-grid.herokuapp.com/poll', {
         method: 'post',
         body: JSON.stringify(data),
         headers: new Headers({
@@ -20,7 +20,7 @@ form.addEventListener('submit', (e) => {
     e.preventDefault();
 })
 
-fetch('http://localhost:5000/poll')
+fetch('https://assessment-grid.herokuapp.com/poll')
     .then(res => res.json())
     .then(data => {
         const scores = data.scores;
